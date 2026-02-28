@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		B2E4152C2F537E1D0046C170 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B2E415152F537E1C0046C170 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B2E4151C2F537E1C0046C170;
+			remoteInfo = cheesehacks2;
+		};
+		B2E415362F537E1D0046C170 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B2E415152F537E1C0046C170 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B2E4151C2F537E1C0046C170;
+			remoteInfo = cheesehacks2;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		B2E4151D2F537E1C0046C170 /* cheesehacks2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cheesehacks2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2E4152B2F537E1D0046C170 /* cheesehacks2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cheesehacks2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2E415352F537E1D0046C170 /* cheesehacks2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cheesehacks2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		B2E4151F2F537E1C0046C170 /* cheesehacks2 */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = cheesehacks2;
+			sourceTree = "<group>";
+		};
+		B2E4152E2F537E1D0046C170 /* cheesehacks2Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = cheesehacks2Tests;
+			sourceTree = "<group>";
+		};
+		B2E415382F537E1D0046C170 /* cheesehacks2UITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = cheesehacks2UITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B2E4151A2F537E1C0046C170 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2E415282F537E1D0046C170 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2E415322F537E1D0046C170 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B2E415142F537E1C0046C170 = {
+			isa = PBXGroup;
+			children = (
+				B2E4151F2F537E1C0046C170 /* cheesehacks2 */,
+				B2E4152E2F537E1D0046C170 /* cheesehacks2Tests */,
+				B2E415382F537E1D0046C170 /* cheesehacks2UITests */,
+				B2E4151E2F537E1C0046C170 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B2E4151E2F537E1C0046C170 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B2E4151D2F537E1C0046C170 /* cheesehacks2.app */,
+				B2E4152B2F537E1D0046C170 /* cheesehacks2Tests.xctest */,
+				B2E415352F537E1D0046C170 /* cheesehacks2UITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B2E4151C2F537E1C0046C170 /* cheesehacks2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B2E4153F2F537E1D0046C170 /* Build configuration list for PBXNativeTarget "cheesehacks2" */;
+			buildPhases = (
+				B2E415192F537E1C0046C170 /* Sources */,
+				B2E4151A2F537E1C0046C170 /* Frameworks */,
+				B2E4151B2F537E1C0046C170 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B2E4151F2F537E1C0046C170 /* cheesehacks2 */,
+			);
+			name = cheesehacks2;
+			packageProductDependencies = (
+			);
+			productName = cheesehacks2;
+			productReference = B2E4151D2F537E1C0046C170 /* cheesehacks2.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B2E4152A2F537E1D0046C170 /* cheesehacks2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B2E415422F537E1D0046C170 /* Build configuration list for PBXNativeTarget "cheesehacks2Tests" */;
+			buildPhases = (
+				B2E415272F537E1D0046C170 /* Sources */,
+				B2E415282F537E1D0046C170 /* Frameworks */,
+				B2E415292F537E1D0046C170 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B2E4152D2F537E1D0046C170 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B2E4152E2F537E1D0046C170 /* cheesehacks2Tests */,
+			);
+			name = cheesehacks2Tests;
+			packageProductDependencies = (
+			);
+			productName = cheesehacks2Tests;
+			productReference = B2E4152B2F537E1D0046C170 /* cheesehacks2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		B2E415342F537E1D0046C170 /* cheesehacks2UITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B2E415452F537E1D0046C170 /* Build configuration list for PBXNativeTarget "cheesehacks2UITests" */;
+			buildPhases = (
+				B2E415312F537E1D0046C170 /* Sources */,
+				B2E415322F537E1D0046C170 /* Frameworks */,
+				B2E415332F537E1D0046C170 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B2E415372F537E1D0046C170 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B2E415382F537E1D0046C170 /* cheesehacks2UITests */,
+			);
+			name = cheesehacks2UITests;
+			packageProductDependencies = (
+			);
+			productName = cheesehacks2UITests;
+			productReference = B2E415352F537E1D0046C170 /* cheesehacks2UITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B2E415152F537E1C0046C170 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					B2E4151C2F537E1C0046C170 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					B2E4152A2F537E1D0046C170 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = B2E4151C2F537E1C0046C170;
+					};
+					B2E415342F537E1D0046C170 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = B2E4151C2F537E1C0046C170;
+					};
+				};
+			};
+			buildConfigurationList = B2E415182F537E1C0046C170 /* Build configuration list for PBXProject "cheesehacks2" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B2E415142F537E1C0046C170;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B2E4151E2F537E1C0046C170 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B2E4151C2F537E1C0046C170 /* cheesehacks2 */,
+				B2E4152A2F537E1D0046C170 /* cheesehacks2Tests */,
+				B2E415342F537E1D0046C170 /* cheesehacks2UITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B2E4151B2F537E1C0046C170 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2E415292F537E1D0046C170 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2E415332F537E1D0046C170 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B2E415192F537E1C0046C170 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2E415272F537E1D0046C170 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2E415312F537E1D0046C170 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B2E4152D2F537E1D0046C170 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B2E4151C2F537E1C0046C170 /* cheesehacks2 */;
+			targetProxy = B2E4152C2F537E1D0046C170 /* PBXContainerItemProxy */;
+		};
+		B2E415372F537E1D0046C170 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B2E4151C2F537E1C0046C170 /* cheesehacks2 */;
+			targetProxy = B2E415362F537E1D0046C170 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		B2E4153D2F537E1D0046C170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		B2E4153E2F537E1D0046C170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		B2E415402F537E1D0046C170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = cheesehacks2/cheesehacks2.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kogun.cheesehacks2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B2E415412F537E1D0046C170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = cheesehacks2/cheesehacks2.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kogun.cheesehacks2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B2E415432F537E1D0046C170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kogun.cheesehacks2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cheesehacks2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/cheesehacks2";
+			};
+			name = Debug;
+		};
+		B2E415442F537E1D0046C170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kogun.cheesehacks2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cheesehacks2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/cheesehacks2";
+			};
+			name = Release;
+		};
+		B2E415462F537E1D0046C170 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kogun.cheesehacks2UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = cheesehacks2;
+			};
+			name = Debug;
+		};
+		B2E415472F537E1D0046C170 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kogun.cheesehacks2UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = cheesehacks2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B2E415182F537E1C0046C170 /* Build configuration list for PBXProject "cheesehacks2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2E4153D2F537E1D0046C170 /* Debug */,
+				B2E4153E2F537E1D0046C170 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B2E4153F2F537E1D0046C170 /* Build configuration list for PBXNativeTarget "cheesehacks2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2E415402F537E1D0046C170 /* Debug */,
+				B2E415412F537E1D0046C170 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B2E415422F537E1D0046C170 /* Build configuration list for PBXNativeTarget "cheesehacks2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2E415432F537E1D0046C170 /* Debug */,
+				B2E415442F537E1D0046C170 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B2E415452F537E1D0046C170 /* Build configuration list for PBXNativeTarget "cheesehacks2UITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2E415462F537E1D0046C170 /* Debug */,
+				B2E415472F537E1D0046C170 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B2E415152F537E1C0046C170 /* Project object */;
+}
