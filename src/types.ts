@@ -23,6 +23,29 @@ export interface WorkflowProject {
     edges: WorkflowEdge[];
 }
 
+export interface Friend {
+    id: string;
+    name: string;
+    avatar: string;
+    currentProject: string;
+    status: 'online' | 'offline';
+}
+
+export interface CommunityGoal {
+    id: string;
+    text: string;
+    completedBy: string[];
+}
+
+export interface Community {
+    id: string;
+    name: string;
+    description: string;
+    members: string[];
+    goals: CommunityGoal[];
+    createdAt: number;
+}
+
 export type ActionType =
     | { type: 'ADD_NODE'; node: WorkflowNode }
     | { type: 'DELETE_NODES'; nodeIds: string[] }
