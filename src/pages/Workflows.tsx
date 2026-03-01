@@ -192,7 +192,7 @@ function WorkflowCanvasView() {
                 <div className="h-11 min-h-[44px] bg-white border-b border-gray-100 flex items-center justify-between px-4 flex-wrap gap-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                         <button
-                            onClick={() => navigate('/workflows')}
+                            onClick={() => navigate('/app/workflows')}
                             className="p-1 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all cursor-pointer"
                             aria-label="Back to workflows"
                         >
@@ -270,7 +270,7 @@ export default function Workflows() {
 
     const handleCreateProject = useCallback(() => {
         const project = createProject('Untitled Workflow');
-        navigate(`/workflows/${project.id}`);
+        navigate(`/app/workflows/${project.id}`);
     }, [createProject, navigate]);
 
     if (currentProject) {
@@ -327,7 +327,7 @@ export default function Workflows() {
                             <div
                                 key={project.id}
                                 className="group bg-white rounded-xl border border-gray-100 p-4 hover:border-indigo-200 hover:shadow-sm transition-all cursor-pointer flex items-center justify-between"
-                                onClick={() => navigate(`/workflows/${project.id}`)}
+                                onClick={() => navigate(`/app/workflows/${project.id}`)}
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
