@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 
 // Set to true to bypass Supabase auth with a fake user
-export const DEV_MODE = true;
+export const DEV_MODE = false;
 
 const DEV_USER = {
   id: 'dev-user-0000-0000-000000000001',
