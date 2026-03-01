@@ -7,7 +7,7 @@ export default function Dashboard() {
 
     const handleCreate = () => {
         const project = createProject('Untitled Workflow');
-        navigate(`/workflows/${project.id}`);
+        navigate(`/app/workflows/${project.id}`);
     };
 
     return (
@@ -57,7 +57,7 @@ export default function Dashboard() {
                                 <div
                                     key={project.id}
                                     className="group bg-white rounded-xl border border-gray-100 p-4 hover:border-indigo-200 hover:shadow-sm transition-all cursor-pointer flex items-center justify-between"
-                                    onClick={() => navigate(`/workflows/${project.id}`)}
+                                    onClick={() => navigate(`/app/workflows/${project.id}`)}
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
