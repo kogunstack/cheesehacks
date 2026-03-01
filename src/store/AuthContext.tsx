@@ -2,6 +2,18 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 
+// Set to true to bypass Supabase auth with a fake user
+export const DEV_MODE = true;
+
+const DEV_USER = {
+  id: 'dev-user-0000-0000-000000000001',
+  email: 'dev@localhost',
+  app_metadata: {},
+  user_metadata: {},
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+} as User;
+
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
@@ -14,10 +26,12 @@ interface AuthState {
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(DEV_MODE ? DEV_USER : null);
+  const [loading, setLoading] = useState(!DEV_MODE);
 
   useEffect(() => {
+    if (DEV_MODE) return;
+
     // Get the initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -35,16 +49,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
+    if (DEV_MODE) {
+      setUser(DEV_USER);
+      return { error: null };
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
   };
 
   const signup = async (email: string, password: string) => {
+    if (DEV_MODE) {
+      setUser(DEV_USER);
+      return { error: null };
+    }
     const { error } = await supabase.auth.signUp({ email, password });
     return { error: error?.message ?? null };
   };
 
   const logout = async () => {
+    if (DEV_MODE) {
+      setUser(DEV_USER); // In dev mode, just stay logged in
+      return;
+    }
     await supabase.auth.signOut();
   };
 

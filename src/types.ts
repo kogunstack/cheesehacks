@@ -47,6 +47,7 @@ export interface Community {
     user_id: string;
     name: string;
     description: string;
+    is_public: boolean;
     created_at: string;
 }
 

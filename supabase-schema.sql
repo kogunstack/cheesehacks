@@ -6,7 +6,7 @@ create table public.profiles (
   id uuid references auth.users(id) on delete cascade primary key,
   email text not null,
   display_name text,
-  avatar_emoji text default '🧑',
+  avatar_emoji text default '👶🏿',
   created_at timestamptz default now()
 );
 
@@ -45,22 +45,38 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- 3. Communities table (per-user, private)
+-- 3. Communities table (with public/private visibility)
 create table public.communities (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
   name text not null,
   description text default '',
+  is_public boolean default true,
   created_at timestamptz default now()
 );
 
 alter table public.communities enable row level security;
 
-create policy "Users manage own communities"
-  on public.communities for all
+-- Users can see their own communities + any public community
+create policy "Users can read own and public communities"
+  on public.communities for select
   to authenticated
-  using (auth.uid() = user_id)
+  using (auth.uid() = user_id or is_public = true);
+
+create policy "Users can create own communities"
+  on public.communities for insert
+  to authenticated
   with check (auth.uid() = user_id);
+
+create policy "Users can update own communities"
+  on public.communities for update
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own communities"
+  on public.communities for delete
+  to authenticated
+  using (auth.uid() = user_id);
 
 -- 4. Community goals table
 create table public.community_goals (
@@ -73,21 +89,36 @@ create table public.community_goals (
 
 alter table public.community_goals enable row level security;
 
-create policy "Users manage goals in own communities"
-  on public.community_goals for all
+create policy "Users can read goals in accessible communities"
+  on public.community_goals for select
   to authenticated
   using (
     exists (
       select 1 from public.communities
       where communities.id = community_goals.community_id
-      and communities.user_id = auth.uid()
+      and (communities.user_id = auth.uid() or communities.is_public = true)
     )
-  )
+  );
+
+create policy "Users can add goals to accessible communities"
+  on public.community_goals for insert
+  to authenticated
   with check (
     exists (
       select 1 from public.communities
       where communities.id = community_goals.community_id
-      and communities.user_id = auth.uid()
+      and (communities.user_id = auth.uid() or communities.is_public = true)
+    )
+  );
+
+create policy "Users can update goals in accessible communities"
+  on public.community_goals for update
+  to authenticated
+  using (
+    exists (
+      select 1 from public.communities
+      where communities.id = community_goals.community_id
+      and (communities.user_id = auth.uid() or communities.is_public = true)
     )
   );
 
