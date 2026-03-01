@@ -1,61 +1,184 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjectStore } from '../store/useProjectStore';
+import { useWorkflowStore } from '../store/useWorkflowStore';
+import { WorkflowStoreProvider } from '../contexts/WorkflowStoreContext';
 import WorkflowCanvas from '../components/canvas/WorkflowCanvas';
-import type { WorkflowNode, WorkflowEdge } from '../types';
+import NodeDetailsDrawerStack, { type DrawerStackItem } from '../components/drawer/NodeDetailsDrawerStack';
+import type { WorkflowNode, WorkflowEdge, NodeType } from '../types';
 import { exportCanvasAsPng } from '../utils/export';
 
-export default function Workflows() {
+export interface BreadcrumbSegment {
+    id: string;
+    name: string;
+}
+
+function WorkflowCanvasView() {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
-    const { projects, createProject, deleteProject, updateProject, getProject } = useProjectStore();
+    const {
+        getProject,
+        updateProject,
+        getSubflow,
+        createSubflow,
+        updateSubflow,
+    } = useProjectStore();
     const canvasRef = useRef<HTMLDivElement>(null);
-
     const currentProject = projectId ? getProject(projectId) : null;
 
-    const handleSave = useCallback(
+    const [path, setPath] = useState<BreadcrumbSegment[]>(() =>
+        currentProject ? [{ id: currentProject.id, name: currentProject.name }] : []
+    );
+    const [drawerStack, setDrawerStack] = useState<DrawerStackItem[]>([]);
+
+    useEffect(() => {
+        if (currentProject && (path.length === 0 || path[0].id !== currentProject.id)) {
+            setPath([{ id: currentProject.id, name: currentProject.name }]);
+        }
+    }, [currentProject?.id, currentProject?.name]);
+
+    const currentGraph = useMemo(() => {
+        if (!currentProject) return { nodes: [] as WorkflowNode[], edges: [] as WorkflowEdge[] };
+        if (path.length === 1) {
+            return { nodes: currentProject.nodes, edges: currentProject.edges };
+        }
+        const sub = getSubflow(currentProject.id, path[path.length - 1].id);
+        return sub ? { nodes: sub.nodes, edges: sub.edges } : { nodes: [], edges: [] };
+    }, [currentProject, path, getSubflow]);
+
+    const handleSaveCurrent = useCallback(
         (nodes: WorkflowNode[], edges: WorkflowEdge[]) => {
             if (!currentProject) return;
-            updateProject({ ...currentProject, nodes, edges });
+            if (path.length === 1) {
+                updateProject({ ...currentProject, nodes, edges });
+            } else {
+                const subflowId = path[path.length - 1].id;
+                const sub = getSubflow(currentProject.id, subflowId);
+                if (sub) updateSubflow(currentProject.id, { ...sub, nodes, edges });
+            }
         },
-        [currentProject, updateProject]
+        [currentProject, path, updateProject, getSubflow, updateSubflow]
     );
 
-    const handleCreateProject = useCallback(() => {
-        const project = createProject('Untitled Workflow');
-        navigate(`/workflows/${project.id}`);
-    }, [createProject, navigate]);
+    const store = useWorkflowStore(
+        currentGraph.nodes,
+        currentGraph.edges,
+        handleSaveCurrent
+    );
+
+    const openDrawer = useCallback((nodeId: string) => {
+        setDrawerStack(prev => {
+            const idx = prev.findIndex(e => e.nodeId === nodeId);
+            if (idx >= 0) {
+                const next = [...prev];
+                const [item] = next.splice(idx, 1);
+                return [{ ...item, collapsed: false }, ...next];
+            }
+            return [{ nodeId, collapsed: false }, ...prev];
+        });
+    }, []);
+    const closeDrawerAll = useCallback(() => setDrawerStack([]), []);
+    const removeFromDrawerStack = useCallback((nodeId: string) => {
+        setDrawerStack(prev => prev.filter(e => e.nodeId !== nodeId));
+    }, []);
+    const toggleDrawerCollapsed = useCallback((nodeId: string) => {
+        setDrawerStack(prev =>
+            prev.map(e => (e.nodeId === nodeId ? { ...e, collapsed: !e.collapsed } : e))
+        );
+    }, []);
+
+    const openSubflow = useCallback(
+        (subflowId: string) => {
+            if (!currentProject) return;
+            let sub = getSubflow(currentProject.id, subflowId);
+            if (!sub) {
+                sub = createSubflow(currentProject.id, 'Untitled Subflow', subflowId);
+            }
+            setPath(prev => [...prev, { id: sub.id, name: sub.name }]);
+        },
+        [currentProject, getSubflow, createSubflow]
+    );
+
+    const defaultTitleForType = (type: NodeType): string => {
+        switch (type) {
+            case 'start': return 'Start';
+            case 'end': return 'End';
+            case 'basic': return 'New Node';
+            case 'milestone': return 'Milestone';
+            case 'decision': return 'Decision';
+            case 'deliverable': return 'Deliverable';
+            case 'subflow': return 'Untitled Subflow';
+            default: return 'New Node';
+        }
+    };
+
+    const addNodeAt = useCallback(
+        (x: number, y: number, type: NodeType) => {
+            if (!currentProject) return;
+            if (type === 'subflow') {
+                const sub = createSubflow(currentProject.id, 'Untitled Subflow');
+                store.addNode(x, y, { type: 'subflow', subflowId: sub.id, title: sub.name });
+            } else {
+                store.addNode(x, y, { type, title: defaultTitleForType(type) });
+            }
+        },
+        [currentProject, createSubflow, store]
+    );
+
+    const goToPathIndex = useCallback((index: number) => {
+        setPath(prev => prev.slice(0, index + 1));
+        setDrawerStack([]);
+    }, []);
 
     const handleExport = useCallback(async () => {
         if (!canvasRef.current || !currentProject) return;
         await exportCanvasAsPng(canvasRef.current, currentProject.name);
     }, [currentProject]);
 
-    // If a project is selected, render the canvas
-    if (currentProject) {
-        return (
+    if (!currentProject) return null;
+
+    return (
+        <WorkflowStoreProvider value={store}>
             <div className="flex-1 flex flex-col h-full overflow-hidden">
-                {/* Project header bar */}
-                <div className="h-11 min-h-[44px] bg-white border-b border-gray-100 flex items-center justify-between px-4">
-                    <div className="flex items-center gap-2">
+                {/* Breadcrumb + header bar */}
+                <div className="h-11 min-h-[44px] bg-white border-b border-gray-100 flex items-center justify-between px-4 flex-wrap gap-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <button
                             onClick={() => navigate('/workflows')}
                             className="p-1 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all cursor-pointer"
+                            aria-label="Back to workflows"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <polyline points="15 18 9 12 15 6" />
                             </svg>
                         </button>
-                        <span className="text-sm font-medium text-gray-700">{currentProject.name}</span>
-                        <span className="text-xs text-gray-400 ml-1">
-                            · {currentProject.nodes.length} nodes
+                        <nav className="flex items-center gap-1 text-sm" aria-label="Breadcrumb">
+                            {path.map((seg, i) => (
+                                <span key={seg.id} className="flex items-center gap-1">
+                                    {i > 0 && (
+                                        <span className="text-gray-300 select-none">/</span>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => goToPathIndex(i)}
+                                        className={`font-medium rounded px-1.5 py-0.5 hover:bg-gray-100 transition-colors cursor-pointer ${
+                                            i === path.length - 1 ? 'text-gray-800' : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                    >
+                                        {seg.name}
+                                    </button>
+                                </span>
+                            ))}
+                        </nav>
+                        <span className="text-xs text-gray-400">
+                            · {store.nodes.length} nodes
                         </span>
                     </div>
                     <button
                         onClick={handleExport}
                         className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md transition-all cursor-pointer"
                     >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                             <polyline points="7 10 12 15 17 10" />
                             <line x1="12" y1="15" x2="12" y2="3" />
@@ -63,14 +186,46 @@ export default function Workflows() {
                         Export
                     </button>
                 </div>
-                <WorkflowCanvas
-                    initialNodes={currentProject.nodes}
-                    initialEdges={currentProject.edges}
-                    onSave={handleSave}
-                    canvasRef={canvasRef}
-                />
+
+                <div className="flex-1 flex min-h-0">
+                    <div className="flex-1 min-w-0 min-h-0">
+                        <WorkflowCanvas
+                            canvasRef={canvasRef}
+                            onOpenDrawer={openDrawer}
+                            onOpenSubflow={openSubflow}
+                            onAddNode={addNodeAt}
+                        />
+                    </div>
+                    {drawerStack.length > 0 && (
+                        <NodeDetailsDrawerStack
+                            stack={drawerStack}
+                            nodes={store.nodes}
+                            onUpdateNode={store.updateNode}
+                            onRemoveFromStack={removeFromDrawerStack}
+                            onToggleCollapsed={toggleDrawerCollapsed}
+                            onCloseAll={closeDrawerAll}
+                        />
+                    )}
+                </div>
             </div>
-        );
+        </WorkflowStoreProvider>
+    );
+}
+
+export default function Workflows() {
+    const { projectId } = useParams<{ projectId: string }>();
+    const navigate = useNavigate();
+    const { projects, createProject, deleteProject, getProject } = useProjectStore();
+
+    const currentProject = projectId ? getProject(projectId) : null;
+
+    const handleCreateProject = useCallback(() => {
+        const project = createProject('Untitled Workflow');
+        navigate(`/workflows/${project.id}`);
+    }, [createProject, navigate]);
+
+    if (currentProject) {
+        return <WorkflowCanvasView />;
     }
 
     // Project list view

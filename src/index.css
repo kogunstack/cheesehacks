@@ -98,6 +98,37 @@
     border-color: var(--color-inprogress-border);
   }
 
+  .node-card.subflow-node {
+    border-style: dashed;
+    border-color: #818cf8;
+    background: linear-gradient(135deg, #f5f3ff 0%, #fff 100%);
+  }
+
+  .node-card.node-type-start {
+    border-left: 3px solid #22c55e;
+    background: linear-gradient(90deg, #f0fdf4 0%, #fff 100%);
+  }
+  .node-card.node-type-end {
+    border-left: 3px solid #ef4444;
+    background: linear-gradient(90deg, #fef2f2 0%, #fff 100%);
+  }
+  .node-card.node-type-milestone {
+    border-left: 3px solid #f59e0b;
+    background: linear-gradient(90deg, #fffbeb 0%, #fff 100%);
+  }
+  .node-card.node-type-decision {
+    border-left: 3px solid #8b5cf6;
+    background: linear-gradient(90deg, #f5f3ff 0%, #fff 100%);
+  }
+  .node-card.node-type-deliverable {
+    border-left: 3px solid #0ea5e9;
+    background: linear-gradient(90deg, #f0f9ff 0%, #fff 100%);
+  }
+
+  .node-card.node-highlighted {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+  }
+
   .connector-handle {
     position: absolute;
     width: 12px;
@@ -133,6 +164,16 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    z-index: 50;
+  }
+
+  .canvas-controls-left {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     z-index: 50;
   }
 

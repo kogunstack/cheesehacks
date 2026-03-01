@@ -1,8 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { WorkflowProject } from '../types';
+import type { WorkflowProject, WorkflowGraph, WorkflowNode } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 const STORAGE_KEY = 'workflows-projects';
+
+const START_POS = { x: 80, y: 80 };
+const END_POS = { x: 80, y: 220 };
+
+function createDefaultStartEndNodes(): WorkflowNode[] {
+    return [
+        { id: uuidv4(), title: 'Start', status: 'not-started', x: START_POS.x, y: START_POS.y, type: 'start' },
+        { id: uuidv4(), title: 'End', status: 'not-started', x: END_POS.x, y: END_POS.y, type: 'end' },
+    ];
+}
 
 function loadProjects(): WorkflowProject[] {
     try {
@@ -31,7 +41,7 @@ export function useProjectStore() {
             name,
             createdAt: now,
             updatedAt: now,
-            nodes: [],
+            nodes: createDefaultStartEndNodes(),
             edges: [],
         };
         setProjects(prev => [project, ...prev]);
@@ -53,5 +63,60 @@ export function useProjectStore() {
         [projects]
     );
 
-    return { projects, createProject, deleteProject, updateProject, getProject };
+    const getSubflow = useCallback(
+        (projectId: string, subflowId: string): WorkflowGraph | null => {
+            const project = projects.find(p => p.id === projectId);
+            if (!project?.subflows) return null;
+            return project.subflows[subflowId] ?? null;
+        },
+        [projects]
+    );
+
+    const createSubflow = useCallback(
+        (projectId: string, name: string, id?: string): WorkflowGraph => {
+            const graphId = id ?? uuidv4();
+            const graph: WorkflowGraph = { id: graphId, name, nodes: createDefaultStartEndNodes(), edges: [] };
+            setProjects(prev =>
+                prev.map(p =>
+                    p.id === projectId
+                        ? {
+                              ...p,
+                              subflows: { ...(p.subflows ?? {}), [graphId]: graph },
+                              updatedAt: Date.now(),
+                          }
+                        : p
+                )
+            );
+            return graph;
+        },
+        []
+    );
+
+    const updateSubflow = useCallback(
+        (projectId: string, graph: WorkflowGraph) => {
+            setProjects(prev =>
+                prev.map(p =>
+                    p.id === projectId
+                        ? {
+                              ...p,
+                              subflows: { ...(p.subflows ?? {}), [graph.id]: graph },
+                              updatedAt: Date.now(),
+                          }
+                        : p
+                )
+            );
+        },
+        []
+    );
+
+    return {
+        projects,
+        createProject,
+        deleteProject,
+        updateProject,
+        getProject,
+        getSubflow,
+        createSubflow,
+        updateSubflow,
+    };
 }

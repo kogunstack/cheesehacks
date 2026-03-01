@@ -52,7 +52,7 @@ export default function EdgeRenderer({
                                 onSelectEdge(edge.id);
                             }}
                         />
-                        {/* Visible path */}
+                        {/* Visible path - pointer-events: none so the hit area above receives clicks */}
                         <path
                             d={path}
                             fill="none"
@@ -62,6 +62,7 @@ export default function EdgeRenderer({
                             className="transition-all duration-150"
                             style={{
                                 filter: isSelected ? 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.3))' : 'none',
+                                pointerEvents: 'none',
                             }}
                         />
                         {/* Arrow */}
@@ -71,6 +72,7 @@ export default function EdgeRenderer({
                             r="3"
                             fill={isSelected ? '#6366f1' : '#cbd5e1'}
                             className="transition-all duration-150"
+                            style={{ pointerEvents: 'none' }}
                         />
                         {/* Delete button (shown on select) */}
                         {isSelected && (

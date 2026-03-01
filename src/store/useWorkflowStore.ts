@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import type { WorkflowNode, WorkflowEdge, ActionType, NodeStatus } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,6 +15,11 @@ export function useWorkflowStore(
     const undoStack = useRef<ActionType[]>([]);
     const redoStack = useRef<ActionType[]>([]);
 
+    useEffect(() => {
+        setNodes(initialNodes);
+        setEdges(initialEdges);
+    }, [initialNodes, initialEdges]);
+
     const save = useCallback(
         (n: WorkflowNode[], e: WorkflowEdge[]) => {
             onSave(n, e);
@@ -29,13 +34,15 @@ export function useWorkflowStore(
 
     // Node operations
     const addNode = useCallback(
-        (x: number, y: number) => {
+        (x: number, y: number, partial?: Partial<WorkflowNode>) => {
             const node: WorkflowNode = {
                 id: uuidv4(),
-                title: 'New Node',
-                status: 'not-started' as NodeStatus,
+                title: partial?.title ?? 'New Node',
+                status: (partial?.status as NodeStatus) ?? 'not-started',
                 x,
                 y,
+                type: partial?.type ?? 'basic',
+                ...partial,
             };
             setNodes(prev => {
                 const next = [...prev, node];
@@ -102,6 +109,20 @@ export function useWorkflowStore(
             pushUndo({ type: 'UPDATE_NODE_STATUS', nodeId, status, prevStatus });
         },
         [edges, pushUndo, save]
+    );
+
+    /** Partial update for node details (drawer). Persists immediately, no undo. */
+    const updateNode = useCallback(
+        (nodeId: string, partial: Partial<WorkflowNode>) => {
+            setNodes(prev => {
+                const next = prev.map(n =>
+                    n.id === nodeId ? { ...n, ...partial } : n
+                );
+                save(next, edges);
+                return next;
+            });
+        },
+        [edges, save]
     );
 
     // Edge operations
@@ -303,6 +324,7 @@ export function useWorkflowStore(
         moveNode,
         updateNodeTitle,
         updateNodeStatus,
+        updateNode,
         addEdge,
         deleteEdge,
         undo,

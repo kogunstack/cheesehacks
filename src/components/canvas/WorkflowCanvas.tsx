@@ -1,22 +1,24 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import type { WorkflowNode as NodeType, WorkflowEdge, NodeStatus } from '../../types';
-import { useWorkflowStore } from '../../store/useWorkflowStore';
+import type { NodeStatus, NodeType } from '../../types';
+import CanvasControls, { NODE_TEMPLATES, type AddNodeMode } from './CanvasControls';
+import { useWorkflowStoreContext } from '../../contexts/WorkflowStoreContext';
 import WorkflowNode from './WorkflowNode';
 import EdgeRenderer from './EdgeRenderer';
-import CanvasControls from './CanvasControls';
+import MiniMapAndFind from './MiniMapAndFind';
+import NodeSearchSlideOut from './NodeSearchSlideOut';
 
 interface WorkflowCanvasProps {
-    initialNodes: NodeType[];
-    initialEdges: WorkflowEdge[];
-    onSave: (nodes: NodeType[], edges: WorkflowEdge[]) => void;
     canvasRef: React.RefObject<HTMLDivElement | null>;
+    onOpenDrawer?: (nodeId: string) => void;
+    onOpenSubflow?: (subflowId: string) => void;
+    onAddNode?: (x: number, y: number, type: NodeType) => void;
 }
 
 export default function WorkflowCanvas({
-    initialNodes,
-    initialEdges,
-    onSave,
     canvasRef,
+    onOpenDrawer,
+    onOpenSubflow,
+    onAddNode,
 }: WorkflowCanvasProps) {
     const {
         nodes,
@@ -35,13 +37,11 @@ export default function WorkflowCanvas({
         selectNode,
         selectEdge,
         clearSelection,
-        setNodes,
-        setEdges,
-    } = useWorkflowStore(initialNodes, initialEdges, onSave);
+    } = useWorkflowStoreContext();
 
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
-    const [addNodeMode, setAddNodeMode] = useState(false);
+    const [addNodeMode, setAddNodeMode] = useState<AddNodeMode>(false);
     const [isPanning, setIsPanning] = useState(false);
     const [tempEdge, setTempEdge] = useState<{
         sourceId: string;
@@ -51,12 +51,58 @@ export default function WorkflowCanvas({
 
     const containerRef = useRef<HTMLDivElement>(null);
     const panStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+    const [highlightNodeIds, setHighlightNodeIds] = useState<Set<string>>(new Set());
+    const [contextMenu, setContextMenu] = useState<{ screenX: number; screenY: number; worldX: number; worldY: number } | null>(null);
 
-    // Sync with prop changes (when switching projects)
     useEffect(() => {
-        setNodes(initialNodes);
-        setEdges(initialEdges);
-    }, [initialNodes, initialEdges, setNodes, setEdges]);
+        const el = containerRef.current;
+        if (!el) return;
+        const ro = new ResizeObserver(() => {
+            const r = el.getBoundingClientRect();
+            setContainerSize({ width: r.width, height: r.height });
+        });
+        ro.observe(el);
+        const r = el.getBoundingClientRect();
+        setContainerSize({ width: r.width, height: r.height });
+        return () => ro.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (!contextMenu) return;
+        const close = () => setContextMenu(null);
+        document.addEventListener('click', close);
+        document.addEventListener('contextmenu', close);
+        return () => {
+            document.removeEventListener('click', close);
+            document.removeEventListener('contextmenu', close);
+        };
+    }, [contextMenu]);
+
+    const handleContextMenu = useCallback(
+        (e: React.MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('.node-card') || target.closest('.canvas-controls') || target.closest('.canvas-controls-left') || target.closest('[data-minimap]')) return;
+            e.preventDefault();
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) return;
+            const worldX = (e.clientX - rect.left - pan.x) / zoom;
+            const worldY = (e.clientY - rect.top - pan.y) / zoom;
+            setContextMenu({ screenX: e.clientX, screenY: e.clientY, worldX, worldY });
+        },
+        [pan, zoom]
+    );
+
+    const handleContextMenuAdd = useCallback(
+        (type: AddNodeMode) => {
+            if (contextMenu && onAddNode && type !== false) {
+                onAddNode(contextMenu.worldX, contextMenu.worldY, type);
+                setAddNodeMode(false);
+            }
+            setContextMenu(null);
+        },
+        [contextMenu, onAddNode]
+    );
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -66,7 +112,7 @@ export default function WorkflowCanvas({
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
             if (e.key === 'n' || e.key === 'N') {
-                setAddNodeMode(prev => !prev);
+                setAddNodeMode(prev => (prev === false ? 'basic' : prev === 'subflow' ? false : prev === 'deliverable' ? 'subflow' : prev === 'decision' ? 'deliverable' : prev === 'milestone' ? 'decision' : 'milestone'));
             }
             if (e.key === 'Delete' || e.key === 'Backspace') {
                 if (selectedNodeIds.size > 0) {
@@ -93,11 +139,22 @@ export default function WorkflowCanvas({
                 setTempEdge(null);
                 clearSelection();
             }
+            if (e.key === 'Enter' && selectedNodeIds.size === 1) {
+                const nodeId = Array.from(selectedNodeIds)[0];
+                const node = nodes.find(n => n.id === nodeId);
+                if (node) {
+                    if (node.type === 'subflow' && node.subflowId && onOpenSubflow) {
+                        onOpenSubflow(node.subflowId);
+                    } else if (onOpenDrawer) {
+                        onOpenDrawer(nodeId);
+                    }
+                }
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedNodeIds, selectedEdgeId, deleteNodes, deleteEdge, undo, redo, clearSelection]);
+    }, [selectedNodeIds, nodes, deleteNodes, deleteEdge, undo, redo, clearSelection, onOpenDrawer, onOpenSubflow]);
 
     // Canvas mouse down (pan or add node)
     const handleCanvasMouseDown = useCallback(
@@ -113,12 +170,21 @@ export default function WorkflowCanvas({
                 return;
             }
 
-            if (addNodeMode) {
+            if (addNodeMode !== false && onAddNode) {
                 const rect = containerRef.current?.getBoundingClientRect();
                 if (!rect) return;
                 const x = (e.clientX - rect.left - pan.x) / zoom;
                 const y = (e.clientY - rect.top - pan.y) / zoom;
-                addNode(x, y);
+                onAddNode(x, y, addNodeMode);
+                setAddNodeMode(false);
+                return;
+            }
+            if (addNodeMode !== false && !onAddNode) {
+                const rect = containerRef.current?.getBoundingClientRect();
+                if (!rect) return;
+                const x = (e.clientX - rect.left - pan.x) / zoom;
+                const y = (e.clientY - rect.top - pan.y) / zoom;
+                addNode(x, y, { type: addNodeMode, title: addNodeMode === 'basic' ? 'New Node' : addNodeMode.charAt(0).toUpperCase() + addNodeMode.slice(1) });
                 setAddNodeMode(false);
                 return;
             }
@@ -133,7 +199,7 @@ export default function WorkflowCanvas({
                 panY: pan.y,
             };
         },
-        [addNodeMode, pan, zoom, addNode, clearSelection]
+        [addNodeMode, pan, zoom, addNode, clearSelection, onAddNode]
     );
 
     // Canvas mouse move (panning or temp edge)
@@ -202,6 +268,32 @@ export default function WorkflowCanvas({
         setZoom(prev => Math.max(0.1, prev - 0.15));
     }, []);
 
+    const centerOnNode = useCallback((nodeId: string) => {
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const nodeCenterX = node.x + 110;
+        const nodeCenterY = node.y + 40;
+        setPan({
+            x: rect.width / 2 - nodeCenterX * zoom,
+            y: rect.height / 2 - nodeCenterY * zoom,
+        });
+    }, [nodes, zoom]);
+
+    const panTo = useCallback((worldX: number, worldY: number) => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        setPan({
+            x: rect.width / 2 - worldX * zoom,
+            y: rect.height / 2 - worldY * zoom,
+        });
+    }, [zoom]);
+
+    const resetView = useCallback(() => {
+        setPan({ x: 0, y: 0 });
+        setZoom(1);
+    }, []);
+
     const handleFitToScreen = useCallback(() => {
         if (nodes.length === 0) {
             setZoom(1);
@@ -248,7 +340,7 @@ export default function WorkflowCanvas({
     return (
         <div
             ref={containerRef}
-            className={`relative w-full h-full overflow-hidden ${addNodeMode ? 'cursor-crosshair' : isPanning ? 'cursor-grabbing' : 'cursor-grab'
+            className={`relative w-full h-full overflow-hidden ${addNodeMode !== false ? 'cursor-crosshair' : isPanning ? 'cursor-grabbing' : 'cursor-grab'
                 }`}
             style={{
                 background: `
@@ -263,6 +355,7 @@ export default function WorkflowCanvas({
             onMouseUp={handleCanvasMouseUp}
             onMouseLeave={handleCanvasMouseUp}
             onWheel={handleWheel}
+            onContextMenu={handleContextMenu}
         >
             {/* Canvas content */}
             <div
@@ -307,6 +400,7 @@ export default function WorkflowCanvas({
                         key={node.id}
                         node={node}
                         isSelected={selectedNodeIds.has(node.id)}
+                        isHighlighted={highlightNodeIds.has(node.id)}
                         zoom={zoom}
                         onSelect={selectNode}
                         onMove={moveNode}
@@ -316,27 +410,87 @@ export default function WorkflowCanvas({
                         }
                         onStartEdge={handleStartEdge}
                         onEndEdge={handleEndEdge}
+                        onOpenDrawer={onOpenDrawer}
+                        onOpenSubflow={onOpenSubflow}
                     />
                 ))}
             </div>
 
-            {/* Controls */}
+            {/* Bottom-left: Add node + Search (slide-out) */}
+            <div className="canvas-controls-left flex flex-row items-center gap-2">
+                <CanvasControls
+                    zoom={zoom}
+                    addNodeMode={addNodeMode}
+                    onZoomIn={handleZoomIn}
+                    onZoomOut={handleZoomOut}
+                    onFitToScreen={handleFitToScreen}
+                    onSetAddNodeMode={setAddNodeMode}
+                    onResetView={resetView}
+                    showAddNode={true}
+                />
+                <NodeSearchSlideOut
+                    nodes={nodes}
+                    onCenterNode={centerOnNode}
+                    onHighlightNodes={setHighlightNodeIds}
+                />
+            </div>
+
+            {/* Bottom-right: Zoom + Fit only */}
             <CanvasControls
                 zoom={zoom}
-                addNodeMode={addNodeMode}
+                addNodeMode={false}
                 onZoomIn={handleZoomIn}
                 onZoomOut={handleZoomOut}
                 onFitToScreen={handleFitToScreen}
-                onToggleAddNode={() => setAddNodeMode(prev => !prev)}
+                onSetAddNodeMode={setAddNodeMode}
+                onResetView={resetView}
+                showAddNode={false}
             />
 
+            {/* Right-click context menu */}
+            {contextMenu && (
+                <div
+                    className="fixed z-[100] py-1 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[160px]"
+                    style={{ left: contextMenu.screenX, top: contextMenu.screenY }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="px-3 py-1.5 text-xs font-medium text-gray-500 border-b border-gray-100">
+                        Add node
+                    </div>
+                    {NODE_TEMPLATES.map(({ type, label, icon }) => (
+                        <button
+                            key={String(type)}
+                            type="button"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 cursor-pointer text-gray-700"
+                            onClick={() => handleContextMenuAdd(type)}
+                        >
+                            <span className="opacity-80">{icon}</span>
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {/* Add node mode indicator */}
-            {addNodeMode && (
+            {addNodeMode !== false && (
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-full shadow-lg shadow-indigo-500/20 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                    Click anywhere to place a node
-                    <span className="text-indigo-200 text-xs ml-1">(ESC to cancel)</span>
+                    Click to place {addNodeMode} node
+                    <span className="text-indigo-200 text-xs ml-1">(N cycle · ESC cancel)</span>
                 </div>
+            )}
+
+            {/* Mini-map + Find */}
+            {containerSize.width > 0 && containerSize.height > 0 && (
+                <MiniMapAndFind
+                    nodes={nodes}
+                    pan={pan}
+                    zoom={zoom}
+                    containerWidth={containerSize.width}
+                    containerHeight={containerSize.height}
+                    onPanTo={panTo}
+                    highlightNodeIds={highlightNodeIds}
+                />
             )}
         </div>
     );

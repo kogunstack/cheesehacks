@@ -4,6 +4,7 @@ import type { WorkflowNode as NodeType, NodeStatus } from '../../types';
 interface WorkflowNodeProps {
     node: NodeType;
     isSelected: boolean;
+    isHighlighted?: boolean;
     zoom: number;
     onSelect: (nodeId: string, shiftKey: boolean) => void;
     onMove: (nodeId: string, x: number, y: number, prevX: number, prevY: number) => void;
@@ -11,6 +12,8 @@ interface WorkflowNodeProps {
     onUpdateStatus: (nodeId: string, status: NodeStatus, prevStatus: NodeStatus) => void;
     onStartEdge: (nodeId: string) => void;
     onEndEdge: (nodeId: string) => void;
+    onOpenDrawer?: (nodeId: string) => void;
+    onOpenSubflow?: (subflowId: string) => void;
 }
 
 const statusColors: Record<NodeStatus, { label: string; bg: string; text: string }> = {
@@ -24,6 +27,7 @@ const statusCycle: NodeStatus[] = ['not-started', 'in-progress', 'done'];
 export default function WorkflowNode({
     node,
     isSelected,
+    isHighlighted = false,
     zoom,
     onSelect,
     onMove,
@@ -31,6 +35,8 @@ export default function WorkflowNode({
     onUpdateStatus,
     onStartEdge,
     onEndEdge,
+    onOpenDrawer,
+    onOpenSubflow,
 }: WorkflowNodeProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(node.title);
@@ -84,10 +90,18 @@ export default function WorkflowNode({
     const handleDoubleClick = useCallback(
         (e: React.MouseEvent) => {
             e.stopPropagation();
+            if (node.type === 'subflow' && node.subflowId && onOpenSubflow) {
+                onOpenSubflow(node.subflowId);
+                return;
+            }
+            if (onOpenDrawer) {
+                onOpenDrawer(node.id);
+                return;
+            }
             setIsEditing(true);
             setEditTitle(node.title);
         },
-        [node.title]
+        [node.id, node.title, node.type, node.subflowId, onOpenDrawer, onOpenSubflow]
     );
 
     const handleTitleBlur = useCallback(() => {
@@ -151,11 +165,13 @@ export default function WorkflowNode({
 
     const statusInfo = statusColors[node.status];
     const isDone = node.status === 'done';
+    const isSubflow = node.type === 'subflow' && node.subflowId;
+    const typeClass = node.type ? `node-type-${node.type}` : '';
 
     return (
         <div
             ref={nodeRef}
-            className={`node-card ${isSelected ? 'selected' : ''} ${isDone ? 'done' : ''} ${node.status === 'in-progress' ? 'in-progress' : ''}`}
+            className={`node-card ${isSelected ? 'selected' : ''} ${isDone ? 'done' : ''} ${node.status === 'in-progress' ? 'in-progress' : ''} ${isSubflow ? 'subflow-node' : ''} ${typeClass} ${isHighlighted ? 'node-highlighted' : ''}`}
             style={{ left: node.x, top: node.y }}
             onMouseDown={handleMouseDown}
             onDoubleClick={handleDoubleClick}
@@ -212,21 +228,26 @@ export default function WorkflowNode({
                 </div>
             </div>
 
-            {/* Status */}
-            <button
-                onClick={handleStatusToggle}
-                className={`mt-2.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${statusInfo.bg} ${statusInfo.text} transition-all cursor-pointer hover:opacity-80`}
-            >
-                <div
-                    className={`w-1.5 h-1.5 rounded-full ${node.status === 'done'
-                        ? 'bg-emerald-500'
-                        : node.status === 'in-progress'
-                            ? 'bg-amber-500'
-                            : 'bg-gray-400'
-                        }`}
-                />
-                {statusInfo.label}
-            </button>
+            {/* Status + Subflow Open hint */}
+            <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                <button
+                    onClick={handleStatusToggle}
+                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${statusInfo.bg} ${statusInfo.text} transition-all cursor-pointer hover:opacity-80`}
+                >
+                    <div
+                        className={`w-1.5 h-1.5 rounded-full ${node.status === 'done'
+                            ? 'bg-emerald-500'
+                            : node.status === 'in-progress'
+                                ? 'bg-amber-500'
+                                : 'bg-gray-400'
+                            }`}
+                    />
+                    {statusInfo.label}
+                </button>
+                {isSubflow && onOpenSubflow && (
+                    <span className="text-[10px] text-indigo-500 font-medium">Double-click to open</span>
+                )}
+            </div>
         </div>
     );
 }
