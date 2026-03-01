@@ -1,8 +1,9 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../store/AuthContext';
 
 const navItems = [
     {
-        path: '/',
+        path: '/app',
         label: 'Dashboard',
         icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -14,7 +15,7 @@ const navItems = [
         ),
     },
     {
-        path: '/workflows',
+        path: '/app/workflows',
         label: 'Workflows',
         icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -28,7 +29,7 @@ const navItems = [
         ),
     },
     {
-        path: '/docs',
+        path: '/app/docs',
         label: 'Docs',
         icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,7 +42,7 @@ const navItems = [
         ),
     },
     {
-        path: '/tasks',
+        path: '/app/tasks',
         label: 'Tasks',
         icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,7 +52,7 @@ const navItems = [
         ),
     },
     {
-        path: '/people',
+        path: '/app/people',
         label: 'People',
         icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -63,7 +64,19 @@ const navItems = [
         ),
     },
     {
-        path: '/settings',
+        path: '/app/communities',
+        label: 'Communities',
+        icon: (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                <path d="M16 3.13a4 4 0 010 7.75" />
+            </svg>
+        ),
+    },
+    {
+        path: '/app/settings',
         label: 'Settings',
         icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -75,6 +88,7 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+    const { user, logout } = useAuth();
     return (
         <aside className="w-[240px] min-w-[240px] h-full bg-[var(--color-sidebar)] flex flex-col">
             {/* Logo */}
@@ -98,7 +112,7 @@ export default function Sidebar() {
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        end={item.path === '/'}
+                        end={item.path === '/app'}
                         className={({ isActive }) =>
                             `sidebar-link ${isActive ? 'active' : ''}`
                         }
@@ -110,16 +124,23 @@ export default function Sidebar() {
             </nav>
 
             {/* Bottom */}
-            <div className="px-5 py-4 border-t border-white/5">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
-                        U
+            <div className="px-5 py-4 border-t border-white/5 flex justify-between items-center group relative">
+                <div className="flex items-center gap-3 w-full">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {user?.email ? user.email.charAt(0).toUpperCase() : 'U'}
                     </div>
-                    <div>
-                        <p className="text-white text-sm font-medium">Local User</p>
+                    <div className="min-w-0 flex-1 overflow-hidden">
+                        <p className="text-white text-sm font-medium truncate">{user?.email ?? 'Local User'}</p>
                         <p className="text-slate-400 text-xs">Free Plan</p>
                     </div>
                 </div>
+                <button
+                    onClick={logout}
+                    className="absolute right-4 text-gray-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                    title="Sign out"
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                </button>
             </div>
         </aside>
     );

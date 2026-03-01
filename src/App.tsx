@@ -4,6 +4,12 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import Workflows from './pages/Workflows';
 import PlaceholderPage from './pages/PlaceholderPage';
+import PeoplePage from './pages/PeoplePage';
+import CommunitiesPage from './pages/CommunitiesPage';
+import LandingPage from './pages/LandingPage';
+import AuthPage from './pages/AuthPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './store/AuthContext';
 import { useProjectStore } from './store/useProjectStore';
 import { useRef, useCallback } from 'react';
 import { exportCanvasAsPng } from './utils/export';
@@ -14,7 +20,7 @@ function AppLayout() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // Extract project name from URL if on a workflow canvas
-  const workflowMatch = location.pathname.match(/^\/workflows\/(.+)/);
+  const workflowMatch = location.pathname.match(/^\/app\/workflows\/(.+)/);
   const projectId = workflowMatch?.[1];
   const project = projectId ? getProject(projectId) : null;
 
@@ -24,7 +30,7 @@ function AppLayout() {
   }, [project]);
 
   return (
-    <div className="h-screen flex">
+    <div className="h-screen overflow-hidden flex">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Header
@@ -33,11 +39,11 @@ function AppLayout() {
         />
         <main className="flex-1 flex min-h-0">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/workflows" element={<Workflows />} />
-            <Route path="/workflows/:projectId" element={<Workflows />} />
+            <Route path="" element={<Dashboard />} />
+            <Route path="workflows" element={<Workflows />} />
+            <Route path="workflows/:projectId" element={<Workflows />} />
             <Route
-              path="/docs"
+              path="docs"
               element={
                 <PlaceholderPage
                   title="Docs"
@@ -53,7 +59,7 @@ function AppLayout() {
               }
             />
             <Route
-              path="/tasks"
+              path="tasks"
               element={
                 <PlaceholderPage
                   title="Tasks"
@@ -66,24 +72,10 @@ function AppLayout() {
                 />
               }
             />
+            <Route path="people" element={<PeoplePage />} />
+            <Route path="communities" element={<CommunitiesPage />} />
             <Route
-              path="/people"
-              element={
-                <PlaceholderPage
-                  title="People"
-                  icon={
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5">
-                      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M23 21v-2a4 4 0 00-3-3.87" />
-                      <path d="M16 3.13a4 4 0 010 7.75" />
-                    </svg>
-                  }
-                />
-              }
-            />
-            <Route
-              path="/settings"
+              path="settings"
               element={
                 <PlaceholderPage
                   title="Settings"
@@ -105,9 +97,22 @@ function AppLayout() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppLayout />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route
+            path="/app/*"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
