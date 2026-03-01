@@ -18,7 +18,8 @@ interface NodeDetailsDrawerStackProps {
     onUpdateNode: (nodeId: string, partial: Partial<WorkflowNode>) => void;
     onRemoveFromStack: (nodeId: string) => void;
     onToggleCollapsed: (nodeId: string) => void;
-    onCloseAll: () => void;
+    panelCollapsed: boolean;
+    onTogglePanelCollapsed: () => void;
 }
 
 export default function NodeDetailsDrawerStack({
@@ -27,11 +28,30 @@ export default function NodeDetailsDrawerStack({
     onUpdateNode,
     onRemoveFromStack,
     onToggleCollapsed,
-    onCloseAll,
+    panelCollapsed,
+    onTogglePanelCollapsed,
 }: NodeDetailsDrawerStackProps) {
     if (stack.length === 0) return null;
 
     const getNode = (nodeId: string) => nodes.find(n => n.id === nodeId) || null;
+
+    if (panelCollapsed) {
+        return (
+            <div className="w-10 flex-shrink-0 h-full flex flex-col bg-white border-l border-gray-200 shadow-xl">
+                <button
+                    type="button"
+                    onClick={onTogglePanelCollapsed}
+                    className="h-full flex items-center justify-center hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+                    aria-label="Expand panel"
+                    title="Expand node details"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: 'rotate(180deg)' }}>
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="w-[380px] flex-shrink-0 h-full flex flex-col bg-white border-l border-gray-200 shadow-xl">
@@ -39,11 +59,14 @@ export default function NodeDetailsDrawerStack({
                 <h2 className="text-sm font-semibold text-gray-800">Node details</h2>
                 <button
                     type="button"
-                    onClick={onCloseAll}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer text-xs font-medium"
-                    aria-label="Close all"
+                    onClick={onTogglePanelCollapsed}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                    aria-label="Collapse panel"
+                    title="Collapse panel"
                 >
-                    Close all
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
                 </button>
             </div>
             <div className="flex-1 overflow-y-auto">

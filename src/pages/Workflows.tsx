@@ -29,13 +29,56 @@ function WorkflowCanvasView() {
     const [path, setPath] = useState<BreadcrumbSegment[]>(() =>
         currentProject ? [{ id: currentProject.id, name: currentProject.name }] : []
     );
-    const [drawerStack, setDrawerStack] = useState<DrawerStackItem[]>([]);
+
+    const drawerStorageKey = useMemo(() => {
+        if (!projectId) return null;
+        const pathIds = path.map(p => p.id).join('-');
+        return `workflow-drawer-${projectId}-${pathIds}`;
+    }, [projectId, path]);
+
+    const [drawerState, setDrawerState] = useState<{
+        stack: DrawerStackItem[];
+        panelCollapsed: boolean;
+    }>({ stack: [], panelCollapsed: false });
+
+    const drawerStack = drawerState.stack;
+    const drawerPanelCollapsed = drawerState.panelCollapsed;
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !drawerStorageKey) return;
+        try {
+            const raw = localStorage.getItem(drawerStorageKey);
+            if (!raw) {
+                setDrawerState({ stack: [], panelCollapsed: false });
+                return;
+            }
+            const parsed = JSON.parse(raw) as { stack?: DrawerStackItem[]; panelCollapsed?: boolean };
+            setDrawerState({
+                stack: Array.isArray(parsed.stack) ? parsed.stack : [],
+                panelCollapsed: Boolean(parsed.panelCollapsed),
+            });
+        } catch {
+            setDrawerState({ stack: [], panelCollapsed: false });
+        }
+    }, [drawerStorageKey]);
 
     useEffect(() => {
         if (currentProject && (path.length === 0 || path[0].id !== currentProject.id)) {
             setPath([{ id: currentProject.id, name: currentProject.name }]);
         }
     }, [currentProject?.id, currentProject?.name]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !drawerStorageKey) return;
+        try {
+            localStorage.setItem(
+                drawerStorageKey,
+                JSON.stringify({ stack: drawerStack, panelCollapsed: drawerPanelCollapsed })
+            );
+        } catch {
+            // ignore
+        }
+    }, [drawerStorageKey, drawerStack, drawerPanelCollapsed]);
 
     const currentGraph = useMemo(() => {
         if (!currentProject) return { nodes: [] as WorkflowNode[], edges: [] as WorkflowEdge[] };
@@ -67,24 +110,30 @@ function WorkflowCanvasView() {
     );
 
     const openDrawer = useCallback((nodeId: string) => {
-        setDrawerStack(prev => {
-            const idx = prev.findIndex(e => e.nodeId === nodeId);
+        setDrawerState(prev => {
+            const prevStack = prev.stack;
+            const idx = prevStack.findIndex(e => e.nodeId === nodeId);
             if (idx >= 0) {
-                const next = [...prev];
+                const next = [...prevStack];
                 const [item] = next.splice(idx, 1);
-                return [{ ...item, collapsed: false }, ...next];
+                return { ...prev, stack: [{ ...item, collapsed: false }, ...next] };
             }
-            return [{ nodeId, collapsed: false }, ...prev];
+            return { ...prev, stack: [{ nodeId, collapsed: false }, ...prevStack] };
         });
     }, []);
-    const closeDrawerAll = useCallback(() => setDrawerStack([]), []);
     const removeFromDrawerStack = useCallback((nodeId: string) => {
-        setDrawerStack(prev => prev.filter(e => e.nodeId !== nodeId));
+        setDrawerState(prev => ({ ...prev, stack: prev.stack.filter(e => e.nodeId !== nodeId) }));
     }, []);
     const toggleDrawerCollapsed = useCallback((nodeId: string) => {
-        setDrawerStack(prev =>
-            prev.map(e => (e.nodeId === nodeId ? { ...e, collapsed: !e.collapsed } : e))
-        );
+        setDrawerState(prev => ({
+            ...prev,
+            stack: prev.stack.map(e =>
+                e.nodeId === nodeId ? { ...e, collapsed: !e.collapsed } : e
+            ),
+        }));
+    }, []);
+    const toggleDrawerPanelCollapsed = useCallback(() => {
+        setDrawerState(prev => ({ ...prev, panelCollapsed: !prev.panelCollapsed }));
     }, []);
 
     const openSubflow = useCallback(
@@ -127,7 +176,6 @@ function WorkflowCanvasView() {
 
     const goToPathIndex = useCallback((index: number) => {
         setPath(prev => prev.slice(0, index + 1));
-        setDrawerStack([]);
     }, []);
 
     const handleExport = useCallback(async () => {
@@ -203,7 +251,8 @@ function WorkflowCanvasView() {
                             onUpdateNode={store.updateNode}
                             onRemoveFromStack={removeFromDrawerStack}
                             onToggleCollapsed={toggleDrawerCollapsed}
-                            onCloseAll={closeDrawerAll}
+                            panelCollapsed={drawerPanelCollapsed}
+                            onTogglePanelCollapsed={toggleDrawerPanelCollapsed}
                         />
                     )}
                 </div>

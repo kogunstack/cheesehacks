@@ -412,6 +412,7 @@ export default function WorkflowCanvas({
                         onEndEdge={handleEndEdge}
                         onOpenDrawer={onOpenDrawer}
                         onOpenSubflow={onOpenSubflow}
+                        onDeleteNode={id => deleteNodes([id])}
                     />
                 ))}
             </div>
